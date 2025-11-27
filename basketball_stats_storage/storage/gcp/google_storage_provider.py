@@ -33,8 +33,9 @@ class GoogleStorageProvider(IStorageProvider):
     def bucket_exists(self, bucket_name: str) -> bool:
         return self._get_bucket(bucket_name).exists()
     
-    def file_exists(self, bucket_name: str, file_name: str) -> bool:
-        return super().file_exists(file_name)
+    def file_exists(self, bucket_name: str, storage_path: str) -> bool:
+        blob = self._get_blob(bucket_name, storage_path)
+        return False if not blob else blob.exists()
     
     def _get_blob(self, bucket_name: str, file_name: str):
         bucket = self._get_bucket(bucket_name)
