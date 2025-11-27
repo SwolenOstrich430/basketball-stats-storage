@@ -1,18 +1,25 @@
-from app.service.storage.igeneric_storage_provider import IGenericStorageProvider
-from app.service.storage.istorage_provider import IStorageProvider
-from app.service.config.config_provider import ConfigProvider
-from app.service.storage.gcp.google_storage_provider import GoogleStorageProvider
+from basketball_stats_storage.storage.igeneric_storage_provider import IGenericStorageProvider
+from basketball_stats_storage.storage.istorage_provider import IStorageProvider
+from basketball_stats_config.config.config_provider import ConfigProvider
+from basketball_stats_storage.storage.gcp.google_storage_provider import GoogleStorageProvider
 
 STORAGE_PREFIX = "storage"
 BUCKETS_PREFIX = "buckets"
-class StorageProvider(IGenericStorageProvider):
-    def __init__(self):
-        self._set_config_provider()
 
-    def upload_file(self, bucket_identifier: str, file_name: str) -> bool:
+class StorageProvider(IGenericStorageProvider):
+    def __init__(self, config_provider: ConfigProvider):
+        self._set_config_provider(config_provider)
+
+    def upload_file(
+        self, 
+        bucket_identifier: str, 
+        storage_path: str, 
+        local_path: str
+    ) -> None:
         return self._get_provider().upload_file(
             self._get_bucket_name(bucket_identifier), 
-            file_name
+            storage_path, 
+            local_path
         )
     
     def download_file(
@@ -20,7 +27,7 @@ class StorageProvider(IGenericStorageProvider):
         bucket_identifier: str, 
         storage_path: str, 
         local_path: str
-    ):
+    ) -> None:
         return self._get_provider().download_file(
             self._get_bucket_name(bucket_identifier), 
             storage_path,
@@ -48,10 +55,10 @@ class StorageProvider(IGenericStorageProvider):
     def _get_provider(self) -> IStorageProvider:
         return GoogleStorageProvider()
 
-    def _set_config_provider(self): 
+    def _set_config_provider(self, config_provider: ConfigProvider) -> None: 
         if not hasattr(self, 'config_provider') or \
             not self._get_config_provider:
-            self.config_provider = ConfigProvider()
+            self.config_provider = config_provider
             
     def _get_config_provider(self) -> ConfigProvider:
         return self.config_provider

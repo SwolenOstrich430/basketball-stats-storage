@@ -2,7 +2,7 @@ import pytest
 from pathlib import Path
 import os 
 
-from app.service.storage.gcp.google_storage_provider import GoogleStorageProvider
+from basketball_stats_storage.storage.gcp.google_storage_provider import GoogleStorageProvider
 
 class TestGoogleStorageProvider():
     
@@ -22,12 +22,12 @@ class TestGoogleStorageProvider():
         )
         mock_blob.exists.return_value = True
 
-        self.subject.upload_file(self.bucket_name, self.storage_path)
+        self.subject.upload_file(self.bucket_name, self.storage_path, self.local_path)
 
         mock_method.assert_called_with(self.bucket_name, self.storage_path)
 
         mock_blob.upload_from_file_name.assert_called_with(
-            self.storage_path
+            self.local_path
         )
 
     def test_upload_file_uploads_file_to_storage_path(self, mocker):
@@ -40,12 +40,14 @@ class TestGoogleStorageProvider():
         )
         mock_blob.exists.return_value = True
 
-        self.subject.upload_file(self.bucket_name, self.storage_path)
+        self.subject.upload_file(
+            self.bucket_name, self.storage_path, self.local_path
+        )
 
         mock_method.assert_called_with(self.bucket_name, self.storage_path)
 
         mock_blob.upload_from_file_name.assert_called_with(
-            self.storage_path
+            self.local_path
         )
 
     def test_upload_file_throws_assertion_error_if_file_does_not_exist_after_upload(
@@ -62,7 +64,9 @@ class TestGoogleStorageProvider():
         mock_blob.exists.return_value = False
 
         with pytest.raises(AssertionError) as _:
-            self.subject.upload_file(self.bucket_name, self.storage_path)
+            self.subject.upload_file(
+                self.bucket_name, self.storage_path, self.local_path
+            )
 
     def test_download_file_throws_assertion_error_if_file_doesnt_already_exist(
         self,

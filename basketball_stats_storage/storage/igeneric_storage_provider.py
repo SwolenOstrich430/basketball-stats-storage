@@ -1,11 +1,16 @@
 from abc import abstractmethod
-from app.service.storage.istorage_provider import IStorageProvider
-from app.service.config.iconfig_provider import IConfigProvider
+from basketball_stats_storage.storage.istorage_provider import IStorageProvider
+from basketball_stats_config.config.iconfig_provider import IConfigProvider
 
 class IGenericStorageProvider(IStorageProvider):
     
     @abstractmethod
-    def upload_file(self, bucket_identifier: str, file_name: str) -> bool: 
+    def upload_file(
+        self, 
+        bucket_identifier: str, 
+        storage_path: str, 
+        local_path: str
+    ) -> None: 
         pass 
 
     @abstractmethod

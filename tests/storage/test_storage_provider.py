@@ -1,11 +1,13 @@
 import pytest 
-from app.service.storage.storage_provider import StorageProvider
-from app.service.config.config_provider import ConfigProvider
+from basketball_stats_storage.storage.storage_provider import StorageProvider
+from basketball_stats_config.config.config_provider import ConfigProvider
 
 class TestStorageProvider():
 
-    def setup_method(self):
-        self.subject = StorageProvider()
+    @pytest.fixture(autouse=True)
+    def init(self, mocker):
+        mock_config_provider = mocker.Mock()
+        self.subject = StorageProvider(config_provider=mock_config_provider)
         self.bucket_identifier = "blop"
         self.bucket_name = "blah"
         self.file_name = "bloop"
@@ -28,13 +30,15 @@ class TestStorageProvider():
 
         self.subject.upload_file(
             self.bucket_identifier,
-            self.file_name
+            self.file_name,
+            self.local_path
         )
 
         mock_method.assert_called_with(self.bucket_identifier)
         provider.upload_file.assert_called_with(
             self.bucket_name,
-            self.file_name
+            self.file_name,
+            self.local_path
         )
 
     def test_download_file_passes_bucket_and_file_name_to_provider_implementation(self, mocker):
@@ -117,13 +121,7 @@ class TestStorageProvider():
 
     def test_get_bucket_key_error_if_supplied_bucket_prefix_isnt_defined(self, mocker):
         with pytest.raises(KeyError) as _:
-            config_provider = ConfigProvider()
-    
-            mocker.patch.object(
-                config_provider,
-                '_get_config', 
-                return_value={"one": 2}
-            )
+            config_provider = ConfigProvider(config={"one": 2})
 
             mocker.patch.object(
                 self.subject,
@@ -135,13 +133,7 @@ class TestStorageProvider():
 
     def test_get_bucket_throws_key_error_if_supplied_bucket_prefix_returns_an_empty_string(self, mocker):
         with pytest.raises(KeyError) as _:
-            config_provider = ConfigProvider()
-    
-            mocker.patch.object(
-                config_provider,
-                '_get_config', 
-                return_value={"one": ""}
-            )
+            config_provider = ConfigProvider(config={"one": ""})
 
             mocker.patch.object(
                 self.subject,
