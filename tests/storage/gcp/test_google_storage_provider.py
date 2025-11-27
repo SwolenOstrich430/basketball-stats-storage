@@ -26,7 +26,7 @@ class TestGoogleStorageProvider():
 
         mock_method.assert_called_with(self.bucket_name, self.storage_path)
 
-        mock_blob.upload_from_file_name.assert_called_with(
+        mock_blob.upload_from_filename.assert_called_with(
             self.local_path
         )
 
@@ -46,7 +46,7 @@ class TestGoogleStorageProvider():
 
         mock_method.assert_called_with(self.bucket_name, self.storage_path)
 
-        mock_blob.upload_from_file_name.assert_called_with(
+        mock_blob.upload_from_filename.assert_called_with(
             self.local_path
         )
 

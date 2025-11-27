@@ -13,7 +13,7 @@ class GoogleStorageProvider(IStorageProvider):
         local_path: str
     ):
         blob = self._get_blob(bucket_name, storage_path)
-        blob.upload_from_file_name(local_path)
+        blob.upload_from_filename(local_path)
         
         assert blob.exists()
     
